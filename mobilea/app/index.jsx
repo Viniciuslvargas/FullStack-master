@@ -1,140 +1,152 @@
-import React from "react";
-import { View, Text, StyleSheet, TextInput, Pressable } from "react-native";
-import { router } from "expo-router";
-import { LinearGradient } from 'expo-linear-gradient';
+import React, { useState, useContext } from 'react';
+import { View, Text, StyleSheet, TextInput, Pressable, Image } from 'react-native';
+import { Link, router } from 'expo-router';
+import { AppContext } from '../scripts/userContext'; 
 
-const Cadastro = () => {
-    const [nome, setNome] = React.useState("");
-    const [email, setEmail] = React.useState("");
-    const [senha, setSenha] = React.useState("");
-    const [sobrenome, setSobrenome] = React.useState("");
-    const [telefone, setTelefone] = React.useState("");
+export default function Login() {
+  const [data, setData] = useState({
+    email: '',
+    senha: ''
+  });
+  const { updateUser } = useContext(AppContext);
 
-    const enviarCadastro = async () => {
-        if (!nome || !senha || !email || !sobrenome || !telefone) {
-            alert("Preencha todos os campos corretamente");
-            return;
-        }
-        try {
-            const resposta = await fetch('http://localhost:8000/autenticacao/registro', {
-                method: 'POST',
-                headers: {
-                    Accept: 'application/json',
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    nome,
-                    sobrenome,
-                    email,
-                    senha,
-                    telefone,
-                }),
-            });
+  const handleLogin = async () => {
+    try {
+      const response = await fetch("http://localhost:8000/autenticacao/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "*/*"
+        },
+        body: JSON.stringify({
+          "email": data.email,
+          "senha": data.senha,
+        })
+      });
 
-            if (resposta.status === 200) {
-                alert("Usuário criado com sucesso");
-                router.replace('../home');
-            } else if (resposta.status === 409) {
-                alert("Email já cadastrado");
-            }
-        } catch (e) {
-            console.log(e);
-        }
-    };
+      const catchMessage = await response.json(); 
+      console.log(catchMessage); 
 
-    return (
-        <LinearGradient
-            colors={['#003366', '#1D2D44']} 
-            style={styles.container}
-        >
-            <Text style={styles.title}>BeatHub</Text>
-            <View style={styles.inputContainer}>
-                <TextInput
-                    style={styles.input}
-                    onChangeText={setNome}
-                    value={nome}
-                    placeholder="Escreva seu nome"
-                    placeholderTextColor="#B3B3B3"
-                />
-                <TextInput
-                    style={styles.input}
-                    onChangeText={setSobrenome}
-                    value={sobrenome}
-                    placeholder="Escreva seu sobrenome"
-                    placeholderTextColor="#B3B3B3"
-                />
-                <TextInput
-                    style={styles.input}
-                    onChangeText={setEmail}
-                    value={email}
-                    placeholder="Escreva seu email"
-                    placeholderTextColor="#B3B3B3"
-                />
-                <TextInput
-                    style={styles.input}
-                    onChangeText={setSenha}
-                    value={senha}
-                    placeholder="Escreva sua senha"
-                    placeholderTextColor="#B3B3B3"
-                    secureTextEntry
-                />
-                <TextInput
-                    style={styles.input}
-                    onChangeText={setTelefone}
-                    value={telefone}
-                    placeholder="Escreva seu telefone"
-                    placeholderTextColor="#B3B3B3"
-                />
+      if (response.ok) {
+        const { userData } = catchMessage; 
+        updateUser({
+          nome: userData.nome,
+          sobreNome: userData.sobrenome,
+          email: userData.email, 
+          dataNascimento: userData.dataNascimento,
+          senha: data.senha, 
+        });
+
+        router.navigate('/home');
+      } else {
+        alert(catchMessage.message || 'Erro ao fazer login');
+        router.navigate('/');
+      }
+
+    } catch (error) {
+      console.log(error);
+      alert('Erro ao conectar ao servidor');
+      router.navigate('/');
+    }
+  };
+
+  return (
+    <View style={style.container}>
+      <Image
+        style={style.logoLogin}
+        source={require("../assets/images/1.png")}
+      />
+      <View>
+        <View style={style.form}>
+          <View>
+            <View style={style.inputContainer}>
+              <Text style={style.label}>Email</Text>
+              <TextInput
+                style={style.input}
+                keyboardType="email-address"
+                placeholder="E-mail"
+                value={data.email}
+                onChangeText={(valor) => { setData({ ...data, email: valor }) }}
+              />
             </View>
-            <Pressable style={styles.button} onPress={enviarCadastro}>
-                <Text style={styles.buttonText}>Enviar Registro</Text>
-            </Pressable>
-        </LinearGradient>
-    );
-};
+            <View style={style.inputContainer}>
+              <Text style={style.label}>Senha</Text>
+              <TextInput
+                secureTextEntry={true}
+                style={style.input}
+                placeholder="Senha"
+                value={data.senha}
+                onChangeText={(valor) => { setData({ ...data, senha: valor }) }}
+              />
+            </View>
+            <Text style={style.label}>
+              Não possui cadastro? <Link href="./cadastro"><Text style={style.link}>Cadastre-se Agora</Text></Link>
+            </Text>
+            <Pressable onPress={handleLogin}><Text style={style.botao}>Entrar</Text></Pressable>
+          </View>
+        </View>
+      </View>
+    </View>
+  );
+}
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        padding: 20,
-    },
-    title: {
-        fontSize: 32,
-        fontWeight: 'bold',
-        marginBottom: 30,
-        textAlign: 'center',
-        backgroundColor: 'transparent',
-        backgroundClip: 'text',
-        WebkitBackgroundClip: 'text',
-        color: 'transparent',
-        backgroundImage: 'linear-gradient(to right, #4D98FF, #00B8FF)', 
-    },
-    inputContainer: {
-        width: '100%',
-    },
-    input: {
-        borderColor: '#4D98FF', 
-        borderWidth: 1,
-        borderRadius: 8,
-        padding: 12,
-        marginTop: 15,
-        backgroundColor: '#FFFFFF', 
-        color: '#003366', 
-    },
-    button: {
-        backgroundColor: '#4D98FF', 
-        borderRadius: 50,
-        paddingVertical: 12,
-        paddingHorizontal: 30,
-        marginTop: 20,
-        alignItems: 'center',
-    },
-    buttonText: {
-        color: '#FFFFFF',
-        fontWeight: 'bold',
-        fontSize: 16,
-    },
+const style = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    backgroundColor: '#182A4E'
+  },
+  logoLogin: {
+    resizeMode: 'cover',
+    width: 400,
+    height: 300
+  },
+  form: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: 'center',
+    rowGap: 5,
+    marginTop: 10,
+  },
+  input: {
+    height: 40,
+    margin: 15,
+    borderWidth: 1,
+    padding: 25,
+    width: 350,
+    borderRadius: 7,
+    backgroundColor: '#FFF',
+    fontSize: 15
+  },
+  link: {
+    color: "#3FD69F",
+    textDecorationLine: "underline"
+  },
+  titleForm: {
+    textAlign: "left",
+    fontSize: 30,
+    fontWeight: "bold",
+  },
+  inputContainer: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "baseline"
+  },
+  botao: {
+    backgroundColor: '#3FD69F',
+    borderRadius: 20,
+    textAlign: 'center',
+    padding: 5,
+    color: '#FFF',
+    width: 150,
+    height: 45,
+    margin: 20,
+    alignSelf: "center",
+    textAlignVertical: "center",
+    marginTop: 80
+  },
+  label: {
+    marginLeft: 12,
+    color: "white"
+  }
 });
-
-export default Cadastro;
