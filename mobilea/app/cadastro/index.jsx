@@ -107,7 +107,7 @@ export default function Cadastro() {
         </View>
         <Text style={style.label}>Já possui cadastro? Fazer <Link href="/"><Text style={style.link}>Login</Text></Link></Text>
         <Pressable onPress={handleSignup} >
-          <Text style={style.botao}>Sign Up</Text>
+        <Link href="http://localhost:8081" asChild><Text style={style.botao}>Sign Up</Text></Link>
         </Pressable>
       </View>
       

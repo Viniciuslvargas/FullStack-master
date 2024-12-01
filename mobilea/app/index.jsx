@@ -82,7 +82,7 @@ export default function Login() {
             <Text style={style.label}>
               Não possui cadastro? <Link href="./cadastro"><Text style={style.link}>Cadastre-se Agora</Text></Link>
             </Text>
-            <Pressable onPress={handleLogin}><Text style={style.botao}>Entrar</Text></Pressable>
+            <Link href="./home"><Pressable onPress={handleLogin}><Text style={style.botao}>Entrar</Text></Pressable></Link>
           </View>
         </View>
       </View>
@@ -136,14 +136,15 @@ const style = StyleSheet.create({
     backgroundColor: '#3FD69F',
     borderRadius: 20,
     textAlign: 'center',
-    padding: 5,
+    padding: 10,
     color: '#FFF',
-    width: 150,
+    width: 180,
     height: 45,
     margin: 20,
     alignSelf: "center",
     textAlignVertical: "center",
-    marginTop: 80
+    marginTop: 80,
+    left: 80,
   },
   label: {
     marginLeft: 12,

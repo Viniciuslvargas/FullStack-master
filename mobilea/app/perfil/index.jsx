@@ -1,117 +1,131 @@
-import React, { useContext, useState } from 'react';
-import { AppContext } from '../../scripts/userContext';
-import { View, Text, StyleSheet, TextInput, Pressable } from 'react-native';
-import Header from '../../components/Header.jsx';
+import React from "react";
+import { Link } from "expo-router";
 
-export default function Perfil() {
-  const { dataUser, updateUser } = useContext(AppContext);
-  const [newPassword, setNewPassword] = useState('');
-  const [isEditing, setIsEditing] = useState(false);
+const styles = {
+  container: {
+    maxWidth: "900px",
+    margin: "20px auto",
+    padding: "20px",
+    backgroundColor: "#121212", // Estilo escuro, típico de aplicativos como Spotify
+    borderRadius: "10px",
+    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+    color: "#fff",
+  },
+  header: {
+    textAlign: "center",
+    marginBottom: "30px",
+  },
+  profileImage: {
+    width: "150px",
+    height: "150px",
+    borderRadius: "50%",
+    objectFit: "cover",
+    marginBottom: "20px",
+  },
+  profileName: {
+    fontSize: "28px",
+    fontWeight: "bold",
+    color: "#fff",
+  },
+  profileDescription: {
+    fontSize: "18px",
+    color: "#ccc",
+    marginTop: "10px",
+  },
+  playlistSection: {
+    marginTop: "40px",
+  },
+  playlistTitle: {
+    fontSize: "24px",
+    marginBottom: "10px",
+    color: "#1db954", // Cor verde do Spotify
+  },
+  playlistItem: {
+    display: "flex",
+    justifyContent: "space-between",
+    marginBottom: "15px",
+    fontSize: "18px",
+  },
+  footer: {
+    textAlign: "center",
+    marginTop: "30px",
+  },
+  logoutButton: {
+    backgroundColor: "#1db954",
+    color: "white",
+    border: "none",
+    padding: "10px 20px",
+    borderRadius: "5px",
+    fontSize: "16px",
+    cursor: "pointer",
+    transition: "background-color 0.3s ease",
+  },
+  logoutButtonHover: {
+    backgroundColor: "#1ed760",
+  },
+};
 
-  if (!dataUser) {
-    return (
-      <View style={style.container}>
-        <Text style={style.label}>Carregando...</Text>
-      </View>
-    );
-  }
+const Perfil = () => {
+  // Dados do usuário (isso poderia vir de um estado ou de uma API)
+  const usuario = {
+    nome: "César Maroli",
+    descricao:
+      "Adoro música e estou sempre descobrindo novas faixas e artistas! Minhas playlists são meu refúgio.",
+    fotoPerfil: "./assets/images/user1.png", // Coloque o caminho correto da imagem
+    playlists: [
+      { nome: "Reagges FOD@S", quantidadeMusicas: 20 },
+      { nome: "MPB", quantidadeMusicas: 15 },
+      { nome: "Funks", quantidadeMusicas: 25 },
+    ],
+  };
 
-  const handlePasswordChange = async () => {
-    try {
-      const response = await fetch("http://localhost:8000/usuarios/updatePassword", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "*/*"
-        },
-        body: JSON.stringify({
-          email: dataUser.email,
-          newPassword: newPassword,
-        })
-      });
-
-      const result = await response.json();
-
-      if (response.ok) {
-        alert('Senha atualizada com sucesso');
-        updateUser({ ...dataUser, senha: newPassword });
-        setIsEditing(false);
-      } else {
-        alert(result.message || 'Erro ao atualizar a senha');
-      }
-    } catch (error) {
-      console.log(error);
-      alert('Erro ao conectar ao servidor');
-    }
+  const logout = () => {
+    // Aqui você pode adicionar a lógica para o logout
+    console.log("Usuário deslogado!");
   };
 
   return (
-    <>
-      <Header titulo={'Perfil'} />
-      <View style={style.container}>
-        <Text style={style.label}>Nome: {dataUser.nome}</Text>
-        <Text style={style.label}>Sobrenome: {dataUser.sobreNome}</Text>
-        <Text style={style.label}>Email: {dataUser.email}</Text>
-        <Text style={style.label}>Senha: {dataUser.senha}</Text>
+    <div style={styles.container}>
+      {/* Cabeçalho do perfil */}
+      <div style={styles.header}>
+        <img
+          src={usuario.fotoPerfil}
+          alt="Perfil"
+          style={styles.profileImage}
+        />
+        <h1 style={styles.profileName}>{usuario.nome}</h1>
+        <p style={styles.profileDescription}>{usuario.descricao}</p>
+      </div>
 
-        {isEditing ? (
-          <>
-            <TextInput
-              style={style.input}
-              placeholder="Nova Senha"
-              secureTextEntry={true}
-              value={newPassword}
-              onChangeText={setNewPassword}
-            />
-            <Pressable onPress={handlePasswordChange}>
-              <Text style={style.botao}>Salvar</Text>
-            </Pressable>
-            <Pressable onPress={() => setIsEditing(false)}>
-              <Text style={style.botao}>Cancelar</Text>
-            </Pressable>
-          </>
-        ) : (
-          <Pressable onPress={() => setIsEditing(true)}>
-            <Text style={style.botao}>Editar Senha</Text>
-          </Pressable>
-        )}
-      </View>
-    </>
+      {/* Seção de playlists */}
+      <div style={styles.playlistSection}>
+        <h2 style={styles.playlistTitle}>Playlists</h2>
+        {usuario.playlists.map((playlist, index) => (
+          <div key={index} style={styles.playlistItem}>
+            <span>{playlist.nome}</span>
+            <span>{playlist.quantidadeMusicas} músicas</span>
+          </div>
+        ))}
+      </div>
+
+      {/* Rodapé com botão de logout */}
+      <div style={styles.footer}>
+        <Link href="/home">
+        <button
+          style={styles.logoutButton}
+          onMouseOver={(e) =>
+            (e.target.style.backgroundColor = styles.logoutButtonHover.backgroundColor)
+          }
+          onMouseOut={(e) =>
+            (e.target.style.backgroundColor = styles.logoutButton.backgroundColor)
+          }
+          onClick={logout}
+        >
+          Sair
+        </button> </Link>
+      </div>
+    </div>
   );
-}
+};
 
-const style = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#2E2E2E',
-    padding: 20
-  },
-  label: {
-    fontSize: 18,
-    color: '#FFF',
-    marginVertical: 10
-  },
-  input: {
-    height: 40,
-    margin: 15,
-    borderWidth: 1,
-    padding: 10,
-    width: 350,
-    borderRadius: 10,
-    backgroundColor: '#FFF',
-    fontSize: 15
-  },
-  botao: {
-    backgroundColor: '#00ff43',
-    borderRadius: 20,
-    textAlign: 'center',
-    padding: 10,
-    color: '#FFF',
-    width: 150,
-    margin: 10,
-    alignSelf: "center",
-    textAlignVertical: "center"
-  }
-});
+export default Perfil;
