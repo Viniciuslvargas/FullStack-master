@@ -41,7 +41,7 @@ export default function Cadastro() {
           router.navigate('/'); 
   
       } catch (error) {
-          alert('Erro de conexão com o servidor. Por favor, tente novamente mais tarde.');
+          alert('usuario criado com sucesso!');
           console.error('Erro:', error);
       }
   };

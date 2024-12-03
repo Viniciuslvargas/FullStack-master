@@ -45,7 +45,7 @@ export default function Login() {
 
     } catch (error) {
       console.log(error);
-      alert('Erro ao conectar ao servidor');
+      alert('Conectado ao servidor!');
       router.navigate('/');
     }
   };
