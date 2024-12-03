@@ -81,7 +81,7 @@ const BeatifyHome = () => {
           />
         </div>
         
-        {/* Músicas em cima, artistas por último */}
+      
         <div style={styles.section}>
           <h2 style={styles.sectionTitle}>Songs</h2>
           <div style={styles.horizontalList}>
@@ -109,7 +109,7 @@ const BeatifyHome = () => {
         </div>
       </main>
 
-      {/* Player fixo na parte inferior */}
+      
       {musicaSelecionada && (
         <div style={styles.player}>
           <div style={styles.playerContent}>
@@ -186,7 +186,7 @@ const styles = {
     flex: 1,
     padding: "20px",
     overflowY: "auto",
-    paddingBottom: "80px",  // espaço para o player na parte inferior
+    paddingBottom: "80px",  
   },
   section: {
     marginBottom: "30px",
